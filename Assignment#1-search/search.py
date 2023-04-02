@@ -87,16 +87,92 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    stack = util.Stack()
+    visited = set()
+
+    state = problem.getStartState()
+    
+    stack.push((state,[]))
+
+    while stack.isEmpty() == False:
+        state, path = stack.pop()
+        # mark visited after popping from stack for DFS
+        visited.add(state)
+
+        if problem.isGoalState(state):
+            return path
+
+        successors = problem.getSuccessors(state)
+        for successor in successors:
+            point, action, cost = successor
+
+            if point not in visited:
+                stack.push((point, path + [action]))
+        
+    return []
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    queue = util.Queue()
+    visited = set()
+
+    state = problem.getStartState()
+    visited.add(state)
+
+    queue.push((state,[]))
+
+    while queue.isEmpty() == False:
+        state, path = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        successors = problem.getSuccessors(state)
+        for successor in successors:
+            point, action, cost = successor
+
+            if point not in visited:
+                queue.push((point, path + [action]))
+                # mark visited after pushing to queue for BFS
+                visited.add(point)
+        
+    return []
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    queue = util.PriorityQueue()
+    visited = set()
+
+    state = problem.getStartState()
+    queue.push((state,[], 0),0)
+
+    while queue.isEmpty() == False:
+        state, path, cost_sum = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+        visited.add(state)
+
+        successors = problem.getSuccessors(state)
+        for successor in successors:
+            point, action, cost = successor
+            # if point is not in visited and not in queue.heap, push to queue
+            if point not in visited and point not in [x[2][0] for x in queue.heap]:
+                queue.push((point, path + [action], cost_sum + cost), cost_sum + cost)
+
+            # if point is in queue.heap, check if the cost is less than the current cost
+            elif point in [x[2][0] for x in queue.heap]:
+                for item in queue.heap:
+                    if item[2][0] == point:
+                        if item[0] > cost_sum + cost:
+                            queue.heap.remove(item)
+                            queue.push((point, path + [action], cost_sum + cost), cost_sum + cost)
+                            break
+    return []
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -109,6 +185,37 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    queue = util.PriorityQueue()
+    visited = set()
+
+    state = problem.getStartState()
+    queue.push((state,[], 0),0)
+
+    while queue.isEmpty() == False:
+        state, path, cost_sum = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+        visited.add(state)
+
+        successors = problem.getSuccessors(state)
+        for successor in successors:
+            point, action, cost = successor
+            # if point is not in visited and not in queue.heap, push to queue
+            if point not in visited and point not in [x[2][0] for x in queue.heap]:
+                # cost_sum + cost + heruistic(point, problem) is the total evaulation cost
+                queue.push((point, path + [action], cost_sum + cost), cost_sum + cost + heuristic(point, problem))
+
+            # if point is in queue.heap, check if the cost is less than the current evaluation cost
+            elif point in [x[2][0] for x in queue.heap]:
+                for item in queue.heap:
+                    if item[2][0] == point:
+                        if item[0] > cost_sum + cost + heuristic(point, problem):
+                            queue.heap.remove(item)
+                            queue.push((point, path + [action], cost_sum + cost), cost_sum + cost + heuristic(point, problem))
+                            break
+    return []
+
     util.raiseNotDefined()
 
 

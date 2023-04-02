@@ -262,6 +262,26 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+def branchHeuristic(position, problem: PositionSearchProblem = None):
+    """
+    Finds the first branch from goal state, returns the distance to that branch
+    """
+    cur = problem.goal
+    cur = problem.getSuccessors(cur)[0][0]
+    
+    while problem.getSuccessors(cur) != []:
+        prev = cur
+        if len(problem.getSuccessors(cur)) == 2:
+            if problem.getSuccessors(cur)[0][0] == prev:
+                cur = problem.getSuccessors(cur)[1][0]
+            else:
+                cur = problem.getSuccessors(cur)[0][0]
+        else:
+            break
+    xy1 = position
+    xy2 = cur
+    # xy2 = (1,3)
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################
