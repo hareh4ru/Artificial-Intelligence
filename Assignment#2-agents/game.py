@@ -514,7 +514,8 @@ class GameStateData:
             return '3'
         return 'E'
 
-    def initialize(self, layout, numGhostAgents):
+    from layout import Layout
+    def initialize(self, layout:Layout, numGhostAgents):
         """
         Creates an initial game state from a layout array (see layout.py).
         """
